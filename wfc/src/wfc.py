@@ -1,17 +1,13 @@
 import os
-import time
 import torch
 import random
 import trimesh
 
 from collections import deque
-from dataclasses import dataclass
 from typing import Dict, Tuple, Optional
 
 
-
 class WaveFunctionCollapseInterface:
-
     XP = "+x"
     XN = "-x"
     YP = "+y"
@@ -22,12 +18,12 @@ class WaveFunctionCollapseInterface:
     directions = [XP, XN, YP, YN, ZP, ZN]
     opposite = {XP: XN, XN: XP, YP: YN, YN: YP, ZP: ZN, ZN: ZP}
     step = {
-        XP: (1, 0, 0), 
-        XN: (-1, 0, 0), 
-        YP: (0, 1, 0), 
-        YN: (0, -1, 0), 
-        ZP: (0, 0, 1), 
-        ZN: (0, 0, -1)
+        XP: (1, 0, 0),
+        XN: (-1, 0, 0),
+        YP: (0, 1, 0),
+        YN: (0, -1, 0),
+        ZP: (0, 0, 1),
+        ZN: (0, 0, -1),
     }
 
     FREE = "free"
@@ -38,7 +34,7 @@ class WaveFunctionCollapseInterface:
 
     TILE_SIZE = 1
 
-    # you can check the tile modeling in tilegpt\assets\tiles.png 
+    # you can check the tile modeling in tilegpt\assets\tiles.png
     INTERFACE = {
         0: {
             XP: FREE,
@@ -121,7 +117,7 @@ class WaveFunctionCollapseInterface:
             ZN: SUPPORT,
         },
         10: {
-            XP: OPEN, 
+            XP: OPEN,
             XN: OPEN,
             YP: CLOSED,
             YN: CLOSED,
@@ -129,7 +125,7 @@ class WaveFunctionCollapseInterface:
             ZN: OPEN,
         },
         11: {
-            XP: CLOSED, 
+            XP: CLOSED,
             XN: CLOSED,
             YP: OPEN,
             YN: OPEN,
@@ -137,7 +133,7 @@ class WaveFunctionCollapseInterface:
             ZN: OPEN,
         },
         12: {
-            XP: OPEN, 
+            XP: OPEN,
             XN: OPEN,
             YP: OPEN,
             YN: OPEN,
@@ -145,7 +141,7 @@ class WaveFunctionCollapseInterface:
             ZN: SUPPORT,
         },
         13: {
-            XP: OPEN, 
+            XP: OPEN,
             XN: OPEN,
             YP: OPEN,
             YN: OPEN,
@@ -153,7 +149,7 @@ class WaveFunctionCollapseInterface:
             ZN: SUPPORT,
         },
         14: {
-            XP: OPEN, 
+            XP: OPEN,
             XN: OPEN,
             YP: CLOSED,
             YN: CLOSED,
@@ -161,7 +157,7 @@ class WaveFunctionCollapseInterface:
             ZN: OPEN,
         },
         15: {
-            XP: CLOSED, 
+            XP: CLOSED,
             XN: CLOSED,
             YP: OPEN,
             YN: OPEN,
@@ -173,14 +169,13 @@ class WaveFunctionCollapseInterface:
 
 class WaveFunctionCollapse(WaveFunctionCollapseInterface):
     def __init__(
-        self, 
-        width: int, 
-        depth: int, 
+        self,
+        width: int,
+        depth: int,
         height: int,
         seed: int,
         empty_weight: float,
     ):
-
         self.width = width
         self.depth = depth
         self.height = height
@@ -200,13 +195,18 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
         self.compatibility = self._compute_compatibility()
 
         self.cell_weights = torch.ones((1, len(self.tiles)))
-        self.cell_weights *= torch.cat([torch.tensor([self.empty_weight]), torch.ones_like(self.cell_weights[0, 1:])])
+        self.cell_weights *= torch.cat(
+            [
+                torch.tensor([self.empty_weight]),
+                torch.ones_like(self.cell_weights[0, 1:]),
+            ]
+        )
         self.cell_weights = self.cell_weights.squeeze(0)
 
     def _reset(
         self,
-        width: Optional[int] = None, 
-        depth: Optional[int] = None, 
+        width: Optional[int] = None,
+        depth: Optional[int] = None,
         height: Optional[int] = None,
         seed: Optional[int] = None,
         empty_weight: Optional[float] = None,
@@ -234,9 +234,13 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
         if empty_weight is not None:
             self.empty_weight = empty_weight
 
-        self.states = torch.ones((self.height, self.depth, self.width, len(self.tiles)), dtype=torch.bool)
+        self.states = torch.ones(
+            (self.height, self.depth, self.width, len(self.tiles)), dtype=torch.bool
+        )
 
-    def _is_compatible(self, tile_a_label: str, tile_b_label: str, direction: str) -> bool:
+    def _is_compatible(
+        self, tile_a_label: str, tile_b_label: str, direction: str
+    ) -> bool:
         """Check if the two tiles are compatible in the given direction
 
         Labels:
@@ -255,20 +259,32 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
             bool: True if the two tiles are compatible in the given direction otherwise False
         """
 
-        assert tile_a_label in (self.FREE, self.OPEN, self.CLOSED, self.SUPPORT, self.EMPTY)
-        assert tile_b_label in (self.FREE, self.OPEN, self.CLOSED, self.SUPPORT, self.EMPTY)
+        assert tile_a_label in (
+            self.FREE,
+            self.OPEN,
+            self.CLOSED,
+            self.SUPPORT,
+            self.EMPTY,
+        )
+        assert tile_b_label in (
+            self.FREE,
+            self.OPEN,
+            self.CLOSED,
+            self.SUPPORT,
+            self.EMPTY,
+        )
 
         # 'free' label is always compatible when the direction is x or y.
         # in the z-direction, two tiles are compatible only if they have the same label.
         if direction in (self.XP, self.XN, self.YP, self.YN):
             if tile_a_label == self.FREE or tile_b_label == self.FREE:
                 return True
-        
+
         return tile_a_label == tile_b_label
 
     def _compute_compatibility(self) -> Dict[str, torch.Tensor]:
         """Compute compatibility matrix for each direction
-            
+
         Example:
             For all tiles, check compatibility between "+x" <-> "-x", "+y" <-> "-y", "+z" <-> "-z"
             The compatibility_matrix is a (t x t) adjacency matrix where `t` is the number of tiles
@@ -306,7 +322,9 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
 
         compatibility = {}
         for direction in self.directions:
-            compatibility_matrix = torch.zeros((len(self.tiles), len(self.tiles)), dtype=torch.bool)
+            compatibility_matrix = torch.zeros(
+                (len(self.tiles), len(self.tiles)), dtype=torch.bool
+            )
             direction_opposite = self.opposite[direction]
 
             for tile_a in self.tiles:
@@ -317,13 +335,17 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
                     tile_b_index = self.tile_to_index[tile_b]
                     tile_b_label = self.INTERFACE[tile_b][direction_opposite]
 
-                    compatibility_matrix[tile_a_index, tile_b_index] = self._is_compatible(tile_a_label, tile_b_label, direction)
+                    compatibility_matrix[tile_a_index, tile_b_index] = (
+                        self._is_compatible(tile_a_label, tile_b_label, direction)
+                    )
 
             compatibility[direction] = compatibility_matrix
 
         return compatibility
 
-    def _get_possible_neighbors(self, possible_tiles: torch.Tensor, direction: str) -> torch.Tensor:
+    def _get_possible_neighbors(
+        self, possible_tiles: torch.Tensor, direction: str
+    ) -> torch.Tensor:
         """Compute possible neighbors of the given tiles with the compatibility matrix
 
         Args:
@@ -360,12 +382,13 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
 
         min_k = torch.inf
         min_k_cell = None
-        
+
         for z in range(self.height):
             for y in range(self.depth):
                 for x in range(self.width):
-                    
-                    possible_tiles_count_of_current_cell = self.states[z, y, x, :].sum().item()
+                    possible_tiles_count_of_current_cell = (
+                        self.states[z, y, x, :].sum().item()
+                    )
                     if possible_tiles_count_of_current_cell == 0:
                         return False
 
@@ -375,11 +398,11 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
                     if possible_tiles_count_of_current_cell < min_k:
                         min_k = possible_tiles_count_of_current_cell
                         min_k_cell = (x, y, z)
-        
+
         return min_k_cell
 
     def _propagate(self, x: int, y: int, z: int) -> bool:
-        """Update the possible neighbor tiles of the collapsed cell 
+        """Update the possible neighbor tiles of the collapsed cell
 
         Args:
             x (int): x coordinate of the collapsed cell
@@ -410,12 +433,21 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
                 az = z + dz
 
                 # check if the coordinates are out of bounds
-                if ax < 0 or ax >= self.width or ay < 0 or ay >= self.depth or az < 0 or az >= self.height:
+                if (
+                    ax < 0
+                    or ax >= self.width
+                    or ay < 0
+                    or ay >= self.depth
+                    or az < 0
+                    or az >= self.height
+                ):
                     continue
-                
+
                 # compute the possible tiles of the neighbor cell
-                possible_neighbors = self._get_possible_neighbors(possible_tiles, direction)
-                
+                possible_neighbors = self._get_possible_neighbors(
+                    possible_tiles, direction
+                )
+
                 before = self.states[az, ay, ax, :]
                 after = before & possible_neighbors
 
@@ -424,7 +456,7 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
 
                 if torch.all(before == after):
                     continue
-                
+
                 # update the possible tiles of the neighbor cell
                 self.states[az, ay, ax, :] = after
                 queue.append((ax, ay, az))
@@ -448,7 +480,9 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
         states_int = self.states[z, y, x, :].float()
         states_int *= self.cell_weights
 
-        tile_index_to_collapse = torch.multinomial(states_int / states_int.sum(), 1).item()
+        tile_index_to_collapse = torch.multinomial(
+            states_int / states_int.sum(), 1
+        ).item()
 
         # Set the possible tiles to false, and the selected tile to true
         self.states[z, y, x, :] = False
@@ -459,7 +493,9 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
 
         return propagation_status
 
-    def run(self, start_x: int, start_y: int, start_z: int, max_iters: int = 10000) -> None:
+    def run(
+        self, start_x: int, start_y: int, start_z: int, max_iters: int = 10000
+    ) -> None:
         """Run the WFC algorithm
 
         Args:
@@ -482,7 +518,7 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
                 self._reset()
                 cell = (start_x, start_y, start_z)
                 continue
-            
+
             # get the cell with minimum possible tiles to collapse
             cell = self._get_min_k_cell()
 
@@ -520,12 +556,20 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
 
                     # trimesh uses xzy coordinates system
                     if isinstance(obj, trimesh.Scene):
-                        for name, geom in obj.geometry.items():
-                            geom.vertices += (x * self.TILE_SIZE, z * self.TILE_SIZE, y * self.TILE_SIZE)
+                        for _, geom in obj.geometry.items():
+                            geom.vertices += (
+                                x * self.TILE_SIZE,
+                                z * self.TILE_SIZE,
+                                y * self.TILE_SIZE,
+                            )
                             model.add_geometry(geom)
 
                     else:
-                        obj.vertices += (x * self.TILE_SIZE, z * self.TILE_SIZE, y * self.TILE_SIZE)
+                        obj.vertices += (
+                            x * self.TILE_SIZE,
+                            z * self.TILE_SIZE,
+                            y * self.TILE_SIZE,
+                        )
                         model.add_geometry(obj)
 
         model.export(path)
