@@ -1,33 +1,39 @@
 // https://github.com/PARKCHEOLHEE-lab/mydevcontainer/blob/main/.devcontainer/devcontainer.json
+
 {
-    "name": "mydevcontainer",
+    "name": "wave-function-collapse",
     "build": {
         "dockerfile": "Dockerfile",
         "context": ".."
     },
     "mounts": [
-        "source=${localEnv:USERPROFILE}/.gitconfig,target=/root/.gitconfig,type=bind",
-        "source=${localEnv:USERPROFILE}/.ssh/id_rsa,target=/root/.ssh/id_rsa,type=bind",
-        "source=${localEnv:USERPROFILE}/.ssh/id_rsa.pub,target=/root/.ssh/id_rsa.pub,type=bind"
+        "source=${localEnv:USERPROFILE}/.gitconfig,target=/home/vscode/.gitconfig,type=bind",
+        "source=${localEnv:USERPROFILE}/.ssh/id_rsa,target=/home/vscode/.ssh/id_rsa,type=bind",
+        "source=${localEnv:USERPROFILE}/.ssh/id_rsa.pub,target=/home/vscode/.ssh/id_rsa.pub,type=bind"
     ],
     "customizations": {
         "vscode": {
             "settings": {
                 "editor.wordWrap": "wordWrapColumn",
                 "editor.wordWrapColumn": 120,
-                "terminal.integrated.shell.linux": "/bin/zsh"
-            },
-            "extensions": [
+                "terminal.integrated.shell.linux": {"bash": "/bin/bash"},
+                "terminal.integrated.defaultProfile.linux": "bash"
+			},
+			"extensions": [
                 "ms-python.python",
-                "ms-python.vscode-pylance",
+				"ms-python.vscode-pylance",
                 "mhutchie.git-graph",
                 "ms-python.debugpy",
+                "hediet.debug-visualizer",
                 "Meezilla.json",
                 "njpwerner.autodocstring",
-                "eamodio.gitlens"
-            ]
-        }
-    },
-    "postCreateCommand": "./post-create-command.sh",
-    "remoteUser": "root"
+                "ms-azuretools.vscode-docker",
+                "ms-toolsai.jupyter",
+                "eamodio.gitlens",
+                "charliermarsh.ruff"
+			]
+		}
+	},
+    "postCreateCommand": "bash .devcontainer/post-create-command.sh",
+    "remoteUser": "vscode"
 }
