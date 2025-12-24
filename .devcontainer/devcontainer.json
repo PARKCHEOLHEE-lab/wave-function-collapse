@@ -1,5 +1,3 @@
-// https://github.com/PARKCHEOLHEE-lab/mydevcontainer/blob/main/.devcontainer/devcontainer.json
-
 {
     "name": "wave-function-collapse",
     "build": {
