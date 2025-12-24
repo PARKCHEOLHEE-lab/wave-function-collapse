@@ -1,0 +1,4 @@
+tqdm==4.66.1
+trimesh==3.23.5
+pre-commit==3.7.0
+torch==2.0.1
