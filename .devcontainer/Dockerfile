@@ -14,7 +14,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN python -m pip install --upgrade pip
-RUN pip3 install tqdm==4.66.1 trimesh==3.23.5 ruff==0.14.10
+RUN pip3 install tqdm==4.66.1 trimesh==3.23.5 ruff==0.14.10 numpy==1.26.4
 RUN pip3 install torch==2.9.1 --index-url https://download.pytorch.org/whl/cpu
 
 USER $USERNAME

@@ -14,12 +14,13 @@
             "settings": {
                 "editor.wordWrap": "wordWrapColumn",
                 "editor.wordWrapColumn": 120,
-                "terminal.integrated.shell.linux": {"bash": "/bin/bash"},
-                "terminal.integrated.defaultProfile.linux": "bash"
-			},
-			"extensions": [
+                "terminal.integrated.shell.linux": "/bin/bash",
+                "python.defaultInterpreterPath": "/bin/python3",
+                "python.languageServer": "Pylance"
+            },
+            "extensions": [
                 "ms-python.python",
-				"ms-python.vscode-pylance",
+                "ms-python.vscode-pylance",
                 "mhutchie.git-graph",
                 "ms-python.debugpy",
                 "hediet.debug-visualizer",
@@ -29,9 +30,9 @@
                 "ms-toolsai.jupyter",
                 "eamodio.gitlens",
                 "charliermarsh.ruff"
-			]
-		}
-	},
+            ]
+        }
+    },
     "postCreateCommand": "bash .devcontainer/post-create-command.sh",
     "remoteUser": "vscode"
 }
