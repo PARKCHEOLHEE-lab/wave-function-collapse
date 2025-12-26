@@ -164,6 +164,38 @@ class WaveFunctionCollapseInterface:
             ZP: OPEN,
             ZN: OPEN,
         },
+        16: {
+            XP: OPEN,
+            XN: SUPPORT,
+            YP: CLOSED,
+            YN: CLOSED,
+            ZP: EMPTY,
+            ZN: SUPPORT,
+        },
+        17: {
+            XP: CLOSED,
+            XN: CLOSED,
+            YP: OPEN,
+            YN: SUPPORT,
+            ZP: EMPTY,
+            ZN: SUPPORT,
+        },
+        18: {
+            XP: SUPPORT,
+            XN: OPEN,
+            YP: CLOSED,
+            YN: CLOSED,
+            ZP: EMPTY,
+            ZN: SUPPORT,
+        },
+        19: {
+            XP: CLOSED,
+            XN: CLOSED,
+            YP: CLOSED,
+            YN: OPEN,
+            ZP: EMPTY,
+            ZN: SUPPORT,
+        },
     }
 
 
