@@ -45,23 +45,31 @@ def get_random_parameters(
     return width, depth, height, seed, empty_weight
 
 
-def main(num_generation: int = 10):
+def main(num_generation: int = 10, intermediate_build: bool = False):
     output_directory = os.path.abspath(os.path.join(__file__, "../../output"))
     os.makedirs(output_directory, exist_ok=True)
 
     wfc = WaveFunctionCollapse(*get_random_parameters())
 
-    for g in tqdm.tqdm(range(1, num_generation + 1)):
+    for g in tqdm.tqdm(range(num_generation)):
+
+        result_directory = os.path.join(output_directory, str(g))
+        os.makedirs(result_directory, exist_ok=True)
+
         wfc.run(
             start_x=random.randint(0, wfc.width - 1),
             start_y=random.randint(0, wfc.depth - 1),
             start_z=0,
+            output_directory=result_directory if intermediate_build else None
         )
 
-        wfc.build(path=os.path.join(output_directory, f"{g}.obj"))
+        wfc.build(path=os.path.join(result_directory, "result.obj"))
 
         wfc._reset(*get_random_parameters())
 
 
 if __name__ == "__main__":
-    main()
+    main(
+        num_generation=3,
+        intermediate_build=True
+    )

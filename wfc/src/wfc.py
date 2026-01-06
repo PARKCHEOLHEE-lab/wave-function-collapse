@@ -526,7 +526,7 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
         return propagation_status
 
     def run(
-        self, start_x: int, start_y: int, start_z: int, max_iters: int = 10000
+        self, start_x: int, start_y: int, start_z: int, max_iters: int = 10000, output_directory: Optional[str] = None
     ) -> None:
         """Run the WFC algorithm
 
@@ -539,7 +539,7 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
 
         cell = (start_x, start_y, start_z)
 
-        for _ in range(max_iters):
+        for i in range(max_iters):
             if self._is_solved():
                 break
 
@@ -562,6 +562,10 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
 
             if cell is None:
                 break
+            
+            if output_directory is not None:
+                self.build(path=os.path.join(output_directory, f"{i}.obj"))
+            
 
     def build(self, path: str) -> None:
         """Build a 3D model based on the wfc states
@@ -604,4 +608,5 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
                         )
                         model.add_geometry(obj)
 
-        model.export(path)
+        if len(model.geometry) > 0:
+            model.export(path)
