@@ -390,7 +390,8 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
 
         possible_neighbors = torch.zeros(possible_tiles.shape[0], dtype=torch.bool)
 
-        for pti in torch.where(possible_tiles == True)[0]:
+        # torch.where(possible_tiles == True) == torch.where(possible_tiles)
+        for pti in torch.where(possible_tiles)[0]:
             possible_neighbors |= self.compatibility[direction][pti]
 
         return possible_neighbors
