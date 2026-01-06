@@ -52,7 +52,6 @@ def main(num_generation: int = 10, intermediate_build: bool = False):
     wfc = WaveFunctionCollapse(*get_random_parameters())
 
     for g in tqdm.tqdm(range(num_generation)):
-
         result_directory = os.path.join(output_directory, str(g))
         os.makedirs(result_directory, exist_ok=True)
 
@@ -60,7 +59,7 @@ def main(num_generation: int = 10, intermediate_build: bool = False):
             start_x=random.randint(0, wfc.width - 1),
             start_y=random.randint(0, wfc.depth - 1),
             start_z=0,
-            output_directory=result_directory if intermediate_build else None
+            output_directory=result_directory if intermediate_build else None,
         )
 
         wfc.build(path=os.path.join(result_directory, "result.obj"))
@@ -69,7 +68,4 @@ def main(num_generation: int = 10, intermediate_build: bool = False):
 
 
 if __name__ == "__main__":
-    main(
-        num_generation=3,
-        intermediate_build=True
-    )
+    main(num_generation=3, intermediate_build=True)
