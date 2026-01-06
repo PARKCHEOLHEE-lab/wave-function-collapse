@@ -580,7 +580,13 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
         for z in range(self.height):
             for y in range(self.depth):
                 for x in range(self.width):
-                    tile_index = self.states[z, y, x, :].int().argmax().item()
+                    
+                    # for intermediate build, skip if the cell is not collapsed
+                    current_states = self.states[z, y, x, :]
+                    if current_states.sum() > 1:
+                        continue
+                    
+                    tile_index = current_states.int().argmax().item()
                     tile = self.index_to_tile[tile_index]
 
                     # empty tile
