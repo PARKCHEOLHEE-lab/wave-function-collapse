@@ -3,7 +3,7 @@ import sys
 import tqdm
 import random
 
-from typing import Tuple
+from typing import Tuple, Optional
 
 from wfc import WaveFunctionCollapse
 
@@ -42,14 +42,40 @@ def get_random_parameters(
     t = random.random()
     empty_weight = (1 - t) * empty_weight_min + t * empty_weight_max
 
-    return width, depth, height, seed, empty_weight
+    return {
+        "width": width,
+        "depth": depth,
+        "height": height,
+        "seed": seed,
+        "empty_weight": empty_weight,
+    }
 
 
-def main(num_generation: int = 10, intermediate_build: bool = False):
+def main(
+    num_generation: int = 1,
+    intermediate_build: bool = False,
+    width: Optional[int] = None,
+    depth: Optional[int] = None,
+    height: Optional[int] = None,
+    seed: Optional[int] = None,
+    empty_weight: Optional[float] = None,
+):
     output_directory = os.path.abspath(os.path.join(__file__, "../../output"))
     os.makedirs(output_directory, exist_ok=True)
+    
+    wfc_parameters = get_random_parameters()
+    if width is not None:
+        wfc_parameters["width"] = width
+    if depth is not None:
+        wfc_parameters["depth"] = depth
+    if height is not None:
+        wfc_parameters["height"] = height
+    if empty_weight is not None:
+        wfc_parameters["empty_weight"] = empty_weight
+    if seed is not None:
+        wfc_parameters["seed"] = seed
 
-    wfc = WaveFunctionCollapse(*get_random_parameters())
+    wfc = WaveFunctionCollapse(**wfc_parameters)
 
     for g in tqdm.tqdm(range(num_generation)):
         result_directory = os.path.join(output_directory, str(g))
@@ -64,8 +90,28 @@ def main(num_generation: int = 10, intermediate_build: bool = False):
 
         wfc.build(path=os.path.join(result_directory, "result.obj"))
 
-        wfc._reset(*get_random_parameters())
+        wfc_parameters = get_random_parameters()
+        if width is not None:
+            wfc_parameters["width"] = width
+        if depth is not None:
+            wfc_parameters["depth"] = depth
+        if height is not None:
+            wfc_parameters["height"] = height
+        if empty_weight is not None:
+            wfc_parameters["empty_weight"] = empty_weight
+        if seed is not None:
+            wfc_parameters["seed"] = seed
+
+        wfc._reset(**wfc_parameters)
 
 
 if __name__ == "__main__":
-    main(num_generation=3, intermediate_build=True)
+    main(
+        num_generation=3, 
+        intermediate_build=False,
+        width=None,
+        depth=None,
+        height=None,
+        seed=None,
+        empty_weight=None,
+    )
