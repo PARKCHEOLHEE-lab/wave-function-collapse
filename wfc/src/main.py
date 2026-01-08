@@ -62,7 +62,7 @@ def main(
 ):
     output_directory = os.path.abspath(os.path.join(__file__, "../../output"))
     os.makedirs(output_directory, exist_ok=True)
-    
+
     wfc_parameters = get_random_parameters()
     if width is not None:
         wfc_parameters["width"] = width
@@ -107,7 +107,7 @@ def main(
 
 if __name__ == "__main__":
     main(
-        num_generation=3, 
+        num_generation=3,
         intermediate_build=False,
         width=None,
         depth=None,
