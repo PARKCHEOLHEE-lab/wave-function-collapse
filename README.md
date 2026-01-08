@@ -9,8 +9,8 @@
 <br>
 
 <div align="center" text-align="justify">
-  <img src="./wfc/assets/animation-0.gif" width="47%">　　
-  <img src="./wfc/assets/animation-1.gif" width="47%">
+  <img src="./wfc/assets/animation-0.gif" width="45%">　　
+  <img src="./wfc/assets/animation-1.gif" width="45%">
   <br><br>
   <p align="center">
     <i>
