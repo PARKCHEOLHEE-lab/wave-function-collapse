@@ -610,7 +610,7 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
                             geom.vertices += (
                                 x * self.TILE_SIZE,
                                 z * self.TILE_SIZE,
-                                y * self.TILE_SIZE,
+                                -y * self.TILE_SIZE,
                             )
                             model.add_geometry(geom)
 
@@ -618,7 +618,7 @@ class WaveFunctionCollapse(WaveFunctionCollapseInterface):
                         obj.vertices += (
                             x * self.TILE_SIZE,
                             z * self.TILE_SIZE,
-                            y * self.TILE_SIZE,
+                            -y * self.TILE_SIZE,
                         )
                         model.add_geometry(obj)
 
