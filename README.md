@@ -50,7 +50,7 @@ This repository uses a Docker container configuration for development environmen
 2. Clone the repository.
 
     ```
-    git clone https://github.com/<your-username>/wave-function-collapse.git
+    git clone https://github.com/PARKCHEOLHEE-lab/wave-function-collapse.git
     ```
 
 3. Open the project with VS Code.
